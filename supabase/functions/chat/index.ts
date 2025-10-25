@@ -29,7 +29,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are ChatMini, a helpful and friendly AI assistant. Keep your responses clear, concise, and conversational." },
+          { role: "system", content: "You are ChatKafi, a helpful and friendly AI assistant. Keep your responses clear, concise, and conversational." },
           ...messages,
         ],
         stream: true,

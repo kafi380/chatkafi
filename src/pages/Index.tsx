@@ -115,7 +115,7 @@ const Index = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              ChatMini
+              ChatKafi
             </h1>
             <p className="text-sm text-muted-foreground">Your AI assistant</p>
           </div>
@@ -130,7 +130,7 @@ const Index = () => {
               <div className="inline-flex p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl mb-4">
                 <Sparkles className="h-12 w-12 text-primary" />
               </div>
-              <h2 className="text-2xl font-semibold mb-2">Welcome to ChatMini</h2>
+              <h2 className="text-2xl font-semibold mb-2">Welcome to ChatKafi</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
                 Start a conversation by typing a message below. I'm here to help!
               </p>
