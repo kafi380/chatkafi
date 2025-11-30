@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
 };
 
 const Index = () => {
@@ -85,8 +86,8 @@ const Index = () => {
     }
   };
 
-  const handleSend = async (input: string) => {
-    const userMsg: Message = { role: "user", content: input };
+  const handleSend = async (input: string, imageData?: string) => {
+    const userMsg: Message = { role: "user", content: input, imageUrl: imageData };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
@@ -138,7 +139,7 @@ const Index = () => {
           )}
           
           {messages.map((message, index) => (
-            <ChatMessage key={index} role={message.role} content={message.content} />
+            <ChatMessage key={index} role={message.role} content={message.content} imageUrl={message.imageUrl} />
           ))}
           
           {isLoading && <TypingIndicator />}

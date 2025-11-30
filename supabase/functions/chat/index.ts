@@ -20,6 +20,23 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Transform messages to support image URLs
+    const formattedMessages = messages.map((msg: any) => {
+      if (msg.imageUrl) {
+        return {
+          role: msg.role,
+          content: [
+            ...(msg.content ? [{ type: "text", text: msg.content }] : []),
+            {
+              type: "image_url",
+              image_url: { url: msg.imageUrl }
+            }
+          ]
+        };
+      }
+      return msg;
+    });
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -27,10 +44,10 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "openai/gpt-5-mini",
         messages: [
-          { role: "system", content: "You are ChatKafi, a helpful and friendly AI assistant. Keep your responses clear, concise, and conversational." },
-          ...messages,
+          { role: "system", content: "You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. Keep your responses clear, concise, and conversational." },
+          ...formattedMessages,
         ],
         stream: true,
       }),

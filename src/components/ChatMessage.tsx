@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
 }
 
-export const ChatMessage = ({ role, content }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, imageUrl }: ChatMessageProps) => {
   return (
     <div
       className={cn(
@@ -21,7 +22,10 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
             : "bg-muted text-foreground mr-12"
         )}
       >
-        <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
+        {imageUrl && (
+          <img src={imageUrl} alt="Uploaded" className="max-w-full rounded-lg mb-2 max-h-64 object-contain" />
+        )}
+        {content && <p className="whitespace-pre-wrap leading-relaxed">{content}</p>}
       </div>
     </div>
   );
