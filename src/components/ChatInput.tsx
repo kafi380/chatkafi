@@ -55,7 +55,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
       <div className="border-t bg-background p-4">
         <div className="max-w-4xl mx-auto">
           {selectedImage && (
-            <div className="mb-4 relative inline-block animate-in fade-in duration-300">
+            <div className="mb-3 relative inline-block animate-in fade-in duration-300">
               <img src={selectedImage} alt="Selected" className="max-h-32 rounded-lg border shadow-sm" />
               <Button
                 size="icon"
@@ -67,7 +67,34 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
               </Button>
             </div>
           )}
-          <div className="flex gap-3">
+          <div className="flex gap-2 items-end">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+            <Button
+              onClick={() => setCameraOpen(true)}
+              disabled={disabled}
+              size="icon"
+              variant="outline"
+              className="h-12 w-12 rounded-xl hover-scale shrink-0"
+              title="Take photo"
+            >
+              <Camera className="h-5 w-5" />
+            </Button>
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled}
+              size="icon"
+              variant="outline"
+              className="h-12 w-12 rounded-xl hover-scale shrink-0"
+              title="Upload image"
+            >
+              <Image className="h-5 w-5" />
+            </Button>
             <div className="flex-1">
               <Textarea
                 value={input}
@@ -75,46 +102,17 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 disabled={disabled}
-                className="min-h-[60px] max-h-[200px] resize-none focus-visible:ring-primary"
+                className="min-h-[48px] max-h-[200px] resize-none focus-visible:ring-primary"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
-              />
-              <Button
-                onClick={() => setCameraOpen(true)}
-                disabled={disabled}
-                size="icon"
-                variant="outline"
-                className="h-[60px] w-[60px] rounded-2xl hover-scale"
-                title="Take photo"
-              >
-                <Camera className="h-5 w-5" />
-              </Button>
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={disabled}
-                size="icon"
-                variant="outline"
-                className="h-[60px] w-[60px] rounded-2xl hover-scale"
-                title="Upload image"
-              >
-                <Image className="h-5 w-5" />
-              </Button>
-              <Button
-                onClick={handleSend}
-                disabled={(!input.trim() && !selectedImage) || disabled}
-                size="icon"
-                className="h-[60px] w-[60px] rounded-2xl hover-scale"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button
+              onClick={handleSend}
+              disabled={(!input.trim() && !selectedImage) || disabled}
+              size="icon"
+              className="h-12 w-12 rounded-xl hover-scale shrink-0"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
