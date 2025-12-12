@@ -1,15 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { ChatMessage } from "@/components/ChatMessage";
+import { ChatMessage, Message, FileData } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { TypingIndicator } from "@/components/TypingIndicator";
 import { Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-  imageUrl?: string;
-};
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -95,8 +89,13 @@ const Index = () => {
     }
   };
 
-  const handleSend = async (input: string, imageData?: string) => {
-    const userMsg: Message = { role: "user", content: input, imageUrl: imageData };
+  const handleSend = async (input: string, imageData?: string, fileData?: FileData) => {
+    const userMsg: Message = { 
+      role: "user", 
+      content: input, 
+      imageUrl: imageData,
+      fileData: fileData
+    };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
@@ -114,7 +113,6 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
@@ -148,9 +146,8 @@ const Index = () => {
           )}
           
           {messages.map((message, index) => (
-            <ChatMessage key={index} role={message.role} content={message.content} imageUrl={message.imageUrl} />
+            <ChatMessage key={index} role={message.role} content={message.content} imageUrl={message.imageUrl} fileData={message.fileData} />
           ))}
-          
           {isLoading && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>

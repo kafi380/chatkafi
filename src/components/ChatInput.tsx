@@ -1,40 +1,65 @@
 import { useState, KeyboardEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Image, X, Camera } from "lucide-react";
+import { Send, Image, X, Camera, Paperclip, FileText, File } from "lucide-react";
 import { CameraCapture } from "./CameraCapture";
 
 interface ChatInputProps {
-  onSend: (message: string, imageData?: string) => void;
+  onSend: (message: string, imageData?: string, fileData?: { name: string; type: string; data: string }) => void;
   disabled?: boolean;
+}
+
+interface SelectedFile {
+  name: string;
+  type: string;
+  data: string;
+  isImage: boolean;
 }
 
 export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
   const [input, setInput] = useState("");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, isImageOnly: boolean) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
+        const isImage = file.type.startsWith("image/");
+        setSelectedFile({
+          name: file.name,
+          type: file.type,
+          data: reader.result as string,
+          isImage
+        });
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleCameraCapture = (imageData: string) => {
-    setSelectedImage(imageData);
+    setSelectedFile({
+      name: "camera-capture.jpg",
+      type: "image/jpeg",
+      data: imageData,
+      isImage: true
+    });
   };
 
   const handleSend = () => {
-    if ((input.trim() || selectedImage) && !disabled) {
-      onSend(input.trim(), selectedImage || undefined);
+    if ((input.trim() || selectedFile) && !disabled) {
+      if (selectedFile?.isImage) {
+        onSend(input.trim(), selectedFile.data, undefined);
+      } else if (selectedFile) {
+        onSend(input.trim(), undefined, { name: selectedFile.name, type: selectedFile.type, data: selectedFile.data });
+      } else {
+        onSend(input.trim());
+      }
       setInput("");
-      setSelectedImage(null);
+      setSelectedFile(null);
     }
   };
 
@@ -43,6 +68,13 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.includes("pdf")) return <FileText className="h-8 w-8 text-red-500" />;
+    if (type.includes("word") || type.includes("document")) return <FileText className="h-8 w-8 text-blue-500" />;
+    if (type.includes("sheet") || type.includes("excel")) return <FileText className="h-8 w-8 text-green-500" />;
+    return <File className="h-8 w-8 text-muted-foreground" />;
   };
 
   return (
@@ -54,14 +86,24 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
       />
       <div className="border-t bg-background p-4">
         <div className="max-w-4xl mx-auto">
-          {selectedImage && (
+          {selectedFile && (
             <div className="mb-3 relative inline-block animate-in fade-in duration-300">
-              <img src={selectedImage} alt="Selected" className="max-h-32 rounded-lg border shadow-sm" />
+              {selectedFile.isImage ? (
+                <img src={selectedFile.data} alt="Selected" className="max-h-32 rounded-lg border shadow-sm" />
+              ) : (
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg border bg-muted/50 shadow-sm">
+                  {getFileIcon(selectedFile.type)}
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium truncate max-w-[200px]">{selectedFile.name}</span>
+                    <span className="text-xs text-muted-foreground">{selectedFile.type.split("/")[1]?.toUpperCase() || "FILE"}</span>
+                  </div>
+                </div>
+              )}
               <Button
                 size="icon"
                 variant="destructive"
                 className="absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg"
-                onClick={() => setSelectedImage(null)}
+                onClick={() => setSelectedFile(null)}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -69,10 +111,17 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
           )}
           <div className="flex gap-2 items-end">
             <input
-              ref={fileInputRef}
+              ref={imageInputRef}
               type="file"
               accept="image/*"
-              onChange={handleImageSelect}
+              onChange={(e) => handleFileSelect(e, true)}
+              className="hidden"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.json,.md"
+              onChange={(e) => handleFileSelect(e, false)}
               className="hidden"
             />
             <Button
@@ -86,7 +135,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
               <Camera className="h-5 w-5" />
             </Button>
             <Button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => imageInputRef.current?.click()}
               disabled={disabled}
               size="icon"
               variant="outline"
@@ -94,6 +143,16 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
               title="Upload image"
             >
               <Image className="h-5 w-5" />
+            </Button>
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled}
+              size="icon"
+              variant="outline"
+              className="h-12 w-12 rounded-xl hover-scale shrink-0"
+              title="Upload file"
+            >
+              <Paperclip className="h-5 w-5" />
             </Button>
             <div className="flex-1">
               <Textarea
@@ -107,7 +166,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
             </div>
             <Button
               onClick={handleSend}
-              disabled={(!input.trim() && !selectedImage) || disabled}
+              disabled={(!input.trim() && !selectedFile) || disabled}
               size="icon"
               className="h-12 w-12 rounded-xl hover-scale shrink-0"
             >
