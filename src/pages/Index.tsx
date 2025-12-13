@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChatMessage, Message, FileData } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { TypingIndicator } from "@/components/TypingIndicator";
-import { Sparkles, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -148,16 +148,25 @@ const Index = () => {
     : user?.email?.charAt(0).toUpperCase() || "G";
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-background to-red-50/30 dark:from-emerald-950/20 dark:via-background dark:to-red-950/20 relative overflow-hidden">
+      {/* Moroccan Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23166534' fill-opacity='1'%3E%3Cpath d='M30 0l30 30-30 30L0 30 30 0zm0 10L10 30l20 20 20-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundSize: '60px 60px'
+      }} />
+      
       {/* Header */}
       <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
-              <Sparkles className="h-6 w-6 text-primary-foreground" />
+            <div className="p-2 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl shadow-lg">
+              {/* Morocco Flag Star */}
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-100" fill="none" />
+              </svg>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-red-600 bg-clip-text text-transparent">
                 ChatKafi
               </h1>
               <p className="text-sm text-muted-foreground">Your AI assistant</p>
@@ -209,8 +218,11 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           {messages.length === 0 && (
             <div className="text-center py-12 animate-in fade-in duration-500">
-              <div className="inline-flex p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl mb-4">
-                <Sparkles className="h-12 w-12 text-primary" />
+              <div className="inline-flex p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 rounded-2xl mb-4">
+                {/* Morocco Flag Star - Large */}
+                <svg className="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-600" fill="none" />
+                </svg>
               </div>
               <h2 className="text-2xl font-semibold mb-2">Welcome to ChatKafi</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
