@@ -164,9 +164,16 @@ const Index = () => {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-red-600 to-red-700 rounded-xl shadow-lg shadow-red-500/20">
-              {/* Morocco Flag Star */}
-              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-400" fill="none" />
+              {/* Morocco Flag Star - High Quality */}
+              <svg className="h-6 w-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path 
+                  d="M50 5 L61.8 38.2 L97.5 38.2 L68.9 58.8 L80.9 92 L50 71.4 L19.1 92 L31.1 58.8 L2.5 38.2 L38.2 38.2 Z" 
+                  stroke="#4ade80" 
+                  strokeWidth="6" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
               </svg>
             </div>
             <div>
@@ -222,15 +229,22 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           {messages.length === 0 && (
             <div className="text-center py-12 animate-in fade-in duration-500">
-              <div className="inline-flex p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 rounded-2xl mb-4">
-                {/* Morocco Flag Star - Large */}
-                <svg className="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-600" fill="none" />
+              <div className="inline-flex p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 rounded-2xl mb-4 shadow-lg shadow-emerald-500/10">
+                {/* Morocco Flag Star - High Quality Pentagram */}
+                <svg className="h-14 w-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path 
+                    d="M50 5 L61.8 38.2 L97.5 38.2 L68.9 58.8 L80.9 92 L50 71.4 L19.1 92 L31.1 58.8 L2.5 38.2 L38.2 38.2 Z" 
+                    stroke="#166534" 
+                    strokeWidth="4" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
                 </svg>
               </div>
               <h2 className="text-2xl font-semibold mb-2">Welcome to ChatKafi</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Start a conversation by typing a message below. I'm here to help!
+                swwlo li bghiti ayjawbk flblassa
               </p>
             </div>
           )}
