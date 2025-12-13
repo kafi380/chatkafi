@@ -148,28 +148,32 @@ const Index = () => {
     : user?.email?.charAt(0).toUpperCase() || "G";
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-background to-red-50/30 dark:from-emerald-950/20 dark:via-background dark:to-red-950/20 relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-background to-red-100/40 dark:from-emerald-950/20 dark:via-background dark:to-red-950/30 relative overflow-hidden">
       {/* Moroccan Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23166534' fill-opacity='1'%3E%3Cpath d='M30 0l30 30-30 30L0 30 30 0zm0 10L10 30l20 20 20-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+      <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='1'%3E%3Cpath d='M30 0l30 30-30 30L0 30 30 0zm0 10L10 30l20 20 20-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         backgroundSize: '60px 60px'
       }} />
       
+      {/* Red accent decorations */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/5 rounded-full blur-3xl pointer-events-none" />
+      
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-red-100/50 dark:border-red-900/20 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl shadow-lg">
+            <div className="p-2 bg-gradient-to-br from-red-600 to-red-700 rounded-xl shadow-lg shadow-red-500/20">
               {/* Morocco Flag Star */}
               <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-100" fill="none" />
+                <path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21.02L12 17.77L6.82 21.02L8 14.14L3 9.27L9.91 8.26L12 2Z" className="stroke-emerald-400" fill="none" />
               </svg>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">
                 ChatKafi
               </h1>
-              <p className="text-sm text-muted-foreground">Your AI assistant</p>
+              <p className="text-sm text-muted-foreground">daka2 2istina3i</p>
             </div>
           </div>
           
