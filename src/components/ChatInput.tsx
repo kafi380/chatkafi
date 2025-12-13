@@ -7,6 +7,7 @@ import { CameraCapture } from "./CameraCapture";
 interface ChatInputProps {
   onSend: (message: string, imageData?: string, fileData?: { name: string; type: string; data: string }) => void;
   disabled?: boolean;
+  isGuest?: boolean;
 }
 
 interface SelectedFile {
@@ -16,7 +17,7 @@ interface SelectedFile {
   isImage: boolean;
 }
 
-export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
+export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps) => {
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -126,31 +127,31 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
             />
             <Button
               onClick={() => setCameraOpen(true)}
-              disabled={disabled}
+              disabled={disabled || isGuest}
               size="icon"
               variant="outline"
               className="h-12 w-12 rounded-xl hover-scale shrink-0"
-              title="Take photo"
+              title={isGuest ? "Sign in to use camera" : "Take photo"}
             >
               <Camera className="h-5 w-5" />
             </Button>
             <Button
               onClick={() => imageInputRef.current?.click()}
-              disabled={disabled}
+              disabled={disabled || isGuest}
               size="icon"
               variant="outline"
               className="h-12 w-12 rounded-xl hover-scale shrink-0"
-              title="Upload image"
+              title={isGuest ? "Sign in to upload images" : "Upload image"}
             >
               <Image className="h-5 w-5" />
             </Button>
             <Button
               onClick={() => fileInputRef.current?.click()}
-              disabled={disabled}
+              disabled={disabled || isGuest}
               size="icon"
               variant="outline"
               className="h-12 w-12 rounded-xl hover-scale shrink-0"
-              title="Upload file"
+              title={isGuest ? "Sign in to upload files" : "Upload file"}
             >
               <Paperclip className="h-5 w-5" />
             </Button>
