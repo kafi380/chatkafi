@@ -149,15 +149,17 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-background to-red-100/40 dark:from-emerald-950/20 dark:via-background dark:to-red-950/30 relative overflow-hidden">
-      {/* Moroccan Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='1'%3E%3Cpath d='M30 0l30 30-30 30L0 30 30 0zm0 10L10 30l20 20 20-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        backgroundSize: '60px 60px'
+      {/* Moroccan Zellige Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-width='1'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z' stroke='%23166534' stroke-opacity='0.6'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40 Z' stroke='%23dc2626' stroke-opacity='0.4'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40 Z' stroke='%23166534' stroke-opacity='0.5'/%3E%3Ccircle cx='40' cy='40' r='8' stroke='%23dc2626' stroke-opacity='0.3'/%3E%3Cpath d='M40 0 L40 80 M0 40 L80 40' stroke='%23166534' stroke-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundSize: '80px 80px'
       }} />
       
-      {/* Red accent decorations */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Red and Green accent decorations */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-red-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-emerald-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-red-400/5 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-32 h-32 bg-emerald-400/6 rounded-full blur-2xl pointer-events-none" />
       
       {/* Header */}
       <header className="border-b border-red-100/50 dark:border-red-900/20 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
@@ -242,8 +244,8 @@ const Index = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold mb-2">Welcome to ChatKafi</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">
+              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">mar7baa biik</h2>
+              <p className="text-muted-foreground max-w-md mx-auto font-semibold">
                 swwlo li bghiti ayjawbk flblassa
               </p>
             </div>
