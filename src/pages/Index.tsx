@@ -148,18 +148,20 @@ const Index = () => {
     : user?.email?.charAt(0).toUpperCase() || "G";
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-background to-red-100/40 dark:from-emerald-950/20 dark:via-background dark:to-red-950/30 relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-100/60 via-background to-red-100/50 dark:from-emerald-950/30 dark:via-background dark:to-red-950/40 relative overflow-hidden">
       {/* Moroccan Zellige Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-width='1'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z' stroke='%23166534' stroke-opacity='0.6'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40 Z' stroke='%23dc2626' stroke-opacity='0.4'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40 Z' stroke='%23166534' stroke-opacity='0.5'/%3E%3Ccircle cx='40' cy='40' r='8' stroke='%23dc2626' stroke-opacity='0.3'/%3E%3Cpath d='M40 0 L40 80 M0 40 L80 40' stroke='%23166534' stroke-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E")`,
+      <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.08] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-width='1.5'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z' stroke='%23166534' stroke-opacity='0.8'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40 Z' stroke='%23dc2626' stroke-opacity='0.6'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40 Z' stroke='%23166534' stroke-opacity='0.7'/%3E%3Ccircle cx='40' cy='40' r='8' stroke='%23dc2626' stroke-opacity='0.5'/%3E%3Cpath d='M40 0 L40 80 M0 40 L80 40' stroke='%23166534' stroke-opacity='0.4'/%3E%3C/g%3E%3C/svg%3E")`,
         backgroundSize: '80px 80px'
       }} />
       
-      {/* Red and Green accent decorations */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-red-500/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-56 h-56 bg-emerald-500/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-red-400/5 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/4 w-32 h-32 bg-emerald-400/6 rounded-full blur-2xl pointer-events-none" />
+      {/* Red and Green accent decorations - enhanced */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-red-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-48 h-48 bg-emerald-400/12 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-2/3 right-1/4 w-40 h-40 bg-red-300/8 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-1/4 left-0 w-32 h-32 bg-emerald-300/10 rounded-full blur-xl pointer-events-none" />
       
       {/* Header */}
       <header className="border-b border-red-100/50 dark:border-red-900/20 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
@@ -231,21 +233,30 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           {messages.length === 0 && (
             <div className="text-center py-12 animate-in fade-in duration-500">
-              <div className="inline-flex p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 rounded-2xl mb-4 shadow-lg shadow-emerald-500/10">
-                {/* Morocco Flag Star - High Quality Pentagram */}
+              <div className="inline-flex p-4 bg-gradient-to-br from-emerald-100 to-red-50 dark:from-emerald-900/30 dark:to-red-800/20 rounded-2xl mb-4 shadow-lg shadow-red-500/20 border border-red-200/30 dark:border-red-800/30">
+                {/* Morocco Flag Star - High Quality Pentagram with red accent */}
                 <svg className="h-14 w-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path 
                     d="M50 5 L61.8 38.2 L97.5 38.2 L68.9 58.8 L80.9 92 L50 71.4 L19.1 92 L31.1 58.8 L2.5 38.2 L38.2 38.2 Z" 
-                    stroke="#166534" 
-                    strokeWidth="4" 
+                    stroke="#dc2626" 
+                    strokeWidth="5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                     fill="none"
                   />
+                  <path 
+                    d="M50 15 L58.5 40 L85 40 L63 55 L72 82 L50 66 L28 82 L37 55 L15 40 L41.5 40 Z" 
+                    stroke="#166534" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    fill="none"
+                    opacity="0.6"
+                  />
                 </svg>
               </div>
               <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">mar7baa biik</h2>
-              <p className="text-muted-foreground max-w-md mx-auto font-semibold">
+              <p className="text-red-600 dark:text-red-500 max-w-md mx-auto font-extrabold text-lg">
                 swwlo li bghiti ayjawbk flblassa
               </p>
             </div>

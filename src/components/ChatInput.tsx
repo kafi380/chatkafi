@@ -160,7 +160,7 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
+                placeholder="KTB HNA"
                 disabled={disabled}
                 className="min-h-[48px] max-h-[200px] resize-none focus-visible:ring-primary"
               />
