@@ -1,8 +1,11 @@
-import { useState, KeyboardEvent, useRef } from "react";
+import { useState, KeyboardEvent, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Image, X, Camera, Paperclip, FileText, File } from "lucide-react";
 import { CameraCapture } from "./CameraCapture";
+import { VoiceButton } from "./VoiceButton";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
+import { toast } from "@/hooks/use-toast";
 
 interface ChatInputProps {
   onSend: (message: string, imageData?: string, fileData?: { name: string; type: string; data: string }) => void;
@@ -23,6 +26,19 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
   const [cameraOpen, setCameraOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleVoiceTranscript = useCallback((transcript: string) => {
+    setInput(prev => prev ? `${prev} ${transcript}` : transcript);
+    toast({
+      title: "Voice captured",
+      description: "Your voice has been transcribed. Edit or send the message.",
+    });
+  }, []);
+
+  const { isListening, isSupported: voiceInputSupported, toggleListening } = useVoiceInput({
+    onTranscript: handleVoiceTranscript,
+    language: 'ar-MA', // Moroccan Arabic/Darija
+  });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, isImageOnly: boolean) => {
     const file = e.target.files?.[0];
@@ -78,6 +94,18 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
     return <File className="h-8 w-8 text-muted-foreground" />;
   };
 
+  const handleVoiceClick = () => {
+    if (!voiceInputSupported) {
+      toast({
+        title: "Voice not supported",
+        description: "Your browser doesn't support voice input. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toggleListening();
+  };
+
   return (
     <>
       <CameraCapture
@@ -125,6 +153,12 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
               onChange={(e) => handleFileSelect(e, false)}
               className="hidden"
             />
+            <VoiceButton
+              type="input"
+              isListening={isListening}
+              onClick={handleVoiceClick}
+              disabled={disabled}
+            />
             <Button
               onClick={() => setCameraOpen(true)}
               disabled={disabled || isGuest}
@@ -160,8 +194,8 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="KTB HNA"
-                disabled={disabled}
+                placeholder={isListening ? "Listening... (تكلم دبا)" : "KTB HNA"}
+                disabled={disabled || isListening}
                 className="min-h-[48px] max-h-[200px] resize-none focus-visible:ring-primary"
               />
             </div>

@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
-import { FileText, File, ExternalLink } from "lucide-react";
+import { FileText, File, ExternalLink, Volume2, VolumeX, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useVoiceOutput } from "@/hooks/useVoiceOutput";
 
 export interface FileData {
   name: string;
@@ -29,6 +31,19 @@ const getFileIcon = (type: string) => {
 };
 
 export const ChatMessage = ({ role, content, imageUrl, fileData }: ChatMessageProps) => {
+  const { isSpeaking, isSupported, speak, stop } = useVoiceOutput({
+    language: 'ar-SA', // Arabic for Darija support
+    rate: 0.9,
+  });
+
+  const handleSpeak = () => {
+    if (isSpeaking) {
+      stop();
+    } else if (content) {
+      speak(content);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -38,7 +53,7 @@ export const ChatMessage = ({ role, content, imageUrl, fileData }: ChatMessagePr
     >
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-6 py-4 shadow-sm",
+          "max-w-[80%] rounded-2xl px-6 py-4 shadow-sm relative group",
           role === "user"
             ? "bg-primary text-primary-foreground ml-12"
             : "bg-muted text-foreground mr-12"
@@ -65,6 +80,28 @@ export const ChatMessage = ({ role, content, imageUrl, fileData }: ChatMessagePr
           </a>
         )}
         {content && <p className="whitespace-pre-wrap leading-relaxed">{content}</p>}
+        
+        {/* Voice output button for assistant messages */}
+        {role === "assistant" && content && isSupported && (
+          <Button
+            onClick={handleSpeak}
+            size="icon"
+            variant="ghost"
+            className={cn(
+              "absolute -bottom-2 -right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg",
+              isSpeaking 
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white" 
+                : "bg-background hover:bg-muted border"
+            )}
+            title={isSpeaking ? "Stop speaking" : "Listen to message (سمع الرسالة)"}
+          >
+            {isSpeaking ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </Button>
+        )}
       </div>
     </div>
   );
