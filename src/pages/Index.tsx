@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ChatMessage, Message, FileData } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { TypingIndicator } from "@/components/TypingIndicator";
-import { LogOut, User } from "lucide-react";
+import { VoiceChat } from "@/components/VoiceChat";
+import { LogOut, User, Phone } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -188,6 +196,26 @@ const Index = () => {
             </div>
           </div>
           
+          <div className="flex items-center gap-2">
+            {/* Voice Chat Button */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <Phone className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl">
+                <SheetHeader>
+                  <SheetTitle className="text-center">
+                    <span className="bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">
+                      محادثة صوتية / Voice Chat
+                    </span>
+                  </SheetTitle>
+                </SheetHeader>
+                <VoiceChat />
+              </SheetContent>
+            </Sheet>
+            
           {/* User Menu or Sign In Button */}
           {user ? (
             <DropdownMenu>
@@ -225,6 +253,7 @@ const Index = () => {
               Sign In
             </Button>
           )}
+          </div>
         </div>
       </header>
 
