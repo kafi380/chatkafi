@@ -13,37 +13,65 @@ export const VoiceChat = ({ onTranscript }: VoiceChatProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [userTranscript, setUserTranscript] = useState('');
+  const [aiTranscript, setAiTranscript] = useState('');
+  const [pulseScale, setPulseScale] = useState(1);
   const chatRef = useRef<RealtimeChat | null>(null);
+  const animationRef = useRef<number>();
+
+  // Animate pulse effect when speaking
+  useEffect(() => {
+    if (isSpeaking) {
+      const animate = () => {
+        setPulseScale(1 + Math.sin(Date.now() / 200) * 0.15);
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      animationRef.current = requestAnimationFrame(animate);
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      setPulseScale(1);
+    }
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isSpeaking]);
 
   const handleMessage = useCallback((event: any) => {
-    // Handle transcriptions
+    // Handle user transcriptions
     if (event.type === 'conversation.item.input_audio_transcription.completed') {
       const userText = event.transcript;
       if (userText) {
-        setTranscript(`You: ${userText}`);
+        setUserTranscript(userText);
         onTranscript?.('user', userText);
       }
     }
     
+    // Handle AI response streaming
     if (event.type === 'response.audio_transcript.delta') {
-      setTranscript(prev => {
-        if (prev.startsWith('AI: ')) {
-          return prev + event.delta;
-        }
-        return `AI: ${event.delta}`;
-      });
+      setAiTranscript(prev => prev + event.delta);
     }
     
+    // Handle AI response complete
     if (event.type === 'response.audio_transcript.done') {
       if (event.transcript) {
         onTranscript?.('assistant', event.transcript);
       }
     }
+
+    // Reset AI transcript on new response
+    if (event.type === 'response.created') {
+      setAiTranscript('');
+    }
   }, [onTranscript]);
 
   const startConversation = useCallback(async () => {
     setIsConnecting(true);
+    setUserTranscript('');
+    setAiTranscript('');
     
     try {
       chatRef.current = new RealtimeChat(
@@ -55,8 +83,8 @@ export const VoiceChat = ({ onTranscript }: VoiceChatProps) => {
       await chatRef.current.init();
       
       toast({
-        title: "متصل / Connected",
-        description: "Voice chat is ready. Start speaking!",
+        title: "✓ متصل / Connected",
+        description: "ابدأ التحدث الآن / Start speaking now!",
       });
     } catch (error) {
       console.error('Error starting conversation:', error);
@@ -75,11 +103,10 @@ export const VoiceChat = ({ onTranscript }: VoiceChatProps) => {
     chatRef.current = null;
     setIsConnected(false);
     setIsSpeaking(false);
-    setTranscript('');
     
     toast({
       title: "غير متصل / Disconnected",
-      description: "Voice chat ended",
+      description: "انتهت المحادثة / Call ended",
     });
   }, []);
 
@@ -90,73 +117,159 @@ export const VoiceChat = ({ onTranscript }: VoiceChatProps) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      {/* Visual feedback orb */}
-      <div 
-        className={cn(
-          "w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300",
+    <div className="flex flex-col items-center gap-6 p-6 h-full">
+      {/* Animated Orb */}
+      <div className="relative flex items-center justify-center my-4">
+        {/* Outer glow rings */}
+        {isConnected && (
+          <>
+            <div 
+              className={cn(
+                "absolute w-40 h-40 rounded-full transition-all duration-300",
+                isSpeaking 
+                  ? "bg-emerald-500/10 animate-ping" 
+                  : "bg-primary/5"
+              )} 
+            />
+            <div 
+              className={cn(
+                "absolute w-32 h-32 rounded-full transition-all duration-500",
+                isSpeaking 
+                  ? "bg-emerald-500/20" 
+                  : "bg-primary/10 animate-pulse"
+              )} 
+            />
+          </>
+        )}
+        
+        {/* Main orb */}
+        <div 
+          className={cn(
+            "relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl",
+            isConnected 
+              ? isSpeaking 
+                ? "bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/40" 
+                : "bg-gradient-to-br from-primary to-red-600 shadow-primary/40"
+              : "bg-gradient-to-br from-muted to-muted/80 shadow-muted/20"
+          )}
+          style={{ transform: `scale(${pulseScale})` }}
+        >
+          {/* Inner gradient overlay */}
+          <div className="absolute inset-2 rounded-full bg-gradient-to-t from-transparent to-white/20" />
+          
+          {/* Icon */}
+          {isConnecting ? (
+            <Loader2 className="w-12 h-12 animate-spin text-white/90" />
+          ) : isConnected ? (
+            isSpeaking ? (
+              <Volume2 className="w-12 h-12 text-white animate-pulse" />
+            ) : (
+              <Mic className="w-12 h-12 text-white" />
+            )
+          ) : (
+            <MicOff className="w-12 h-12 text-muted-foreground" />
+          )}
+        </div>
+
+        {/* Sound wave indicators */}
+        {isConnected && isSpeaking && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-28 h-28 rounded-full border-2 border-emerald-400/30 animate-ping"
+                style={{ 
+                  animationDelay: `${i * 0.3}s`,
+                  animationDuration: '1.5s'
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Status Text */}
+      <div className="text-center space-y-1">
+        <p className={cn(
+          "text-lg font-semibold transition-colors",
           isConnected 
             ? isSpeaking 
-              ? "bg-emerald-500/20 animate-pulse shadow-lg shadow-emerald-500/30" 
-              : "bg-primary/20 shadow-md"
-            : "bg-muted"
-        )}
-      >
-        {isConnecting ? (
-          <Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
-        ) : isConnected ? (
-          isSpeaking ? (
-            <Volume2 className="w-10 h-10 text-emerald-500 animate-pulse" />
-          ) : (
-            <Mic className="w-10 h-10 text-primary" />
-          )
-        ) : (
-          <MicOff className="w-10 h-10 text-muted-foreground" />
-        )}
-      </div>
-
-      {/* Status text */}
-      <div className="text-center min-h-[60px]">
-        <p className="text-sm text-muted-foreground">
+              ? "text-emerald-600 dark:text-emerald-400" 
+              : "text-primary"
+            : "text-muted-foreground"
+        )}>
           {isConnecting 
-            ? "جاري الاتصال... / Connecting..." 
+            ? "جاري الاتصال..." 
             : isConnected 
               ? isSpeaking 
-                ? "كيتكلم... / Speaking..." 
-                : "كيسمع... / Listening..."
-              : "اضغط لبدء المحادثة / Tap to start"
+                ? "كيجاوبك..." 
+                : "كيسمع ليك..."
+              : "اضغط للاتصال"
           }
         </p>
-        {transcript && (
-          <p className="text-xs text-muted-foreground mt-2 max-w-xs truncate">
-            {transcript}
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground">
+          {isConnecting 
+            ? "Connecting..." 
+            : isConnected 
+              ? isSpeaking 
+                ? "AI is speaking..." 
+                : "Listening to you..."
+              : "Tap to start voice chat"
+          }
+        </p>
       </div>
 
-      {/* Control button */}
-      <Button
-        onClick={isConnected ? endConversation : startConversation}
-        disabled={isConnecting}
-        size="lg"
-        variant={isConnected ? "destructive" : "default"}
-        className={cn(
-          "rounded-full w-16 h-16 p-0",
-          isConnected && "animate-pulse"
-        )}
-      >
-        {isConnecting ? (
-          <Loader2 className="w-6 h-6 animate-spin" />
-        ) : isConnected ? (
-          <PhoneOff className="w-6 h-6" />
-        ) : (
-          <Phone className="w-6 h-6" />
-        )}
-      </Button>
+      {/* Transcripts */}
+      {isConnected && (userTranscript || aiTranscript) && (
+        <div className="w-full max-w-sm space-y-3 bg-muted/50 rounded-xl p-4 max-h-32 overflow-y-auto">
+          {userTranscript && (
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground mb-1 block">أنت / You</span>
+              <p className="text-sm bg-primary/10 rounded-lg px-3 py-2 inline-block text-right">
+                {userTranscript}
+              </p>
+            </div>
+          )}
+          {aiTranscript && (
+            <div className="text-left">
+              <span className="text-xs text-muted-foreground mb-1 block">ChatKafi</span>
+              <p className="text-sm bg-emerald-500/10 rounded-lg px-3 py-2 inline-block">
+                {aiTranscript}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
-      <p className="text-xs text-muted-foreground">
-        {isConnected ? "اضغط للإنهاء / Tap to end" : "محادثة صوتية / Voice Chat"}
-      </p>
+      {/* Control Button */}
+      <div className="flex flex-col items-center gap-3 mt-auto pb-4">
+        <Button
+          onClick={isConnected ? endConversation : startConversation}
+          disabled={isConnecting}
+          size="lg"
+          className={cn(
+            "rounded-full w-16 h-16 p-0 transition-all duration-300 shadow-lg",
+            isConnected 
+              ? "bg-red-500 hover:bg-red-600 shadow-red-500/30" 
+              : "bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/30"
+          )}
+        >
+          {isConnecting ? (
+            <Loader2 className="w-7 h-7 animate-spin text-white" />
+          ) : isConnected ? (
+            <PhoneOff className="w-7 h-7 text-white" />
+          ) : (
+            <Phone className="w-7 h-7 text-white" />
+          )}
+        </Button>
+        
+        <p className="text-xs text-muted-foreground font-medium">
+          {isConnected 
+            ? "اضغط للإنهاء / End Call" 
+            : "محادثة صوتية بالدارجة / Voice Chat"
+          }
+        </p>
+      </div>
     </div>
   );
 };
