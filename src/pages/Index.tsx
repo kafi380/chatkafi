@@ -20,6 +20,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -204,13 +205,16 @@ const Index = () => {
                   <Phone className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl">
-                <SheetHeader>
+              <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+                <SheetHeader className="pb-2">
                   <SheetTitle className="text-center">
-                    <span className="bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent text-xl">
                       محادثة صوتية / Voice Chat
                     </span>
                   </SheetTitle>
+                  <SheetDescription className="text-center text-sm">
+                    تحدث بالدارجة أو أي لغة / Speak in Darija or any language
+                  </SheetDescription>
                 </SheetHeader>
                 <VoiceChat />
               </SheetContent>
