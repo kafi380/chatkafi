@@ -2,13 +2,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import LanguageSelection from "./pages/LanguageSelection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Check if language has been selected
+const hasSelectedLanguage = () => {
+  return localStorage.getItem("chatKafi_language") !== null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -18,7 +24,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={hasSelectedLanguage() ? <Navigate to="/chat" replace /> : <LanguageSelection />} />
+            <Route path="/chat" element={hasSelectedLanguage() ? <Index /> : <Navigate to="/" replace />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
