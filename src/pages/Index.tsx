@@ -4,7 +4,7 @@ import { ChatMessage, Message, FileData } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { TypingIndicator } from "@/components/TypingIndicator";
 import { VoiceChat } from "@/components/VoiceChat";
-import { LogOut, User, Phone } from "lucide-react";
+import { LogOut, User, Phone, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,54 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+const translations = {
+  darija: {
+    subtitle: "daka2 2istina3i",
+    welcome: "mar7baa biik",
+    prompt: "swwlo li bghiti ayjawbk flblassa",
+    voiceTitle: "محادثة صوتية / Voice Chat",
+    voiceDesc: "تحدث بالدارجة أو أي لغة",
+    signIn: "دخول",
+    logOut: "خروج",
+  },
+  english: {
+    subtitle: "AI Assistant",
+    welcome: "Welcome!",
+    prompt: "Ask me anything and I'll answer right away",
+    voiceTitle: "Voice Chat",
+    voiceDesc: "Speak in any language",
+    signIn: "Sign In",
+    logOut: "Log out",
+  },
+  french: {
+    subtitle: "Assistant IA",
+    welcome: "Bienvenue!",
+    prompt: "Posez-moi une question et je répondrai immédiatement",
+    voiceTitle: "Chat Vocal",
+    voiceDesc: "Parlez dans n'importe quelle langue",
+    signIn: "Connexion",
+    logOut: "Déconnexion",
+  },
+  german: {
+    subtitle: "KI-Assistent",
+    welcome: "Willkommen!",
+    prompt: "Fragen Sie mich etwas und ich antworte sofort",
+    voiceTitle: "Sprachchat",
+    voiceDesc: "Sprechen Sie in jeder Sprache",
+    signIn: "Anmelden",
+    logOut: "Abmelden",
+  },
+};
+
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const language = (localStorage.getItem("chatKafi_language") || "darija") as keyof typeof translations;
+  const t = translations[language];
   
   const isGuest = !user;
 
@@ -52,7 +94,7 @@ const Index = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: chatMessages }),
+      body: JSON.stringify({ messages: chatMessages, language }),
     });
 
     if (!resp.ok) {
@@ -193,7 +235,7 @@ const Index = () => {
               <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">
                 ChatKafi
               </h1>
-              <p className="text-sm text-muted-foreground">daka2 2istina3i</p>
+              <p className="text-sm text-muted-foreground">{t.subtitle}</p>
             </div>
           </div>
           
@@ -209,11 +251,11 @@ const Index = () => {
                 <SheetHeader className="pb-2">
                   <SheetTitle className="text-center">
                     <span className="bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent text-xl">
-                      محادثة صوتية / Voice Chat
+                      {t.voiceTitle}
                     </span>
                   </SheetTitle>
                   <SheetDescription className="text-center text-sm">
-                    تحدث بالدارجة أو أي لغة / Speak in Darija or any language
+                    {t.voiceDesc}
                   </SheetDescription>
                 </SheetHeader>
                 <VoiceChat />
@@ -247,14 +289,14 @@ const Index = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{t.logOut}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Button onClick={() => navigate("/auth")} variant="outline">
               <User className="mr-2 h-4 w-4" />
-              Sign In
+              {t.signIn}
             </Button>
           )}
           </div>
@@ -286,11 +328,11 @@ const Index = () => {
                     fill="none"
                     opacity="0.6"
                   />
-                </svg>
+              </svg>
               </div>
-              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">mar7baa biik</h2>
+              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-600 to-emerald-600 bg-clip-text text-transparent">{t.welcome}</h2>
               <p className="text-red-600 dark:text-red-500 max-w-md mx-auto font-extrabold text-lg">
-                swwlo li bghiti ayjawbk flblassa
+                {t.prompt}
               </p>
             </div>
           )}
