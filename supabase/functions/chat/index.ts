@@ -15,7 +15,6 @@ const messageSchema = z.object({
 
 const requestSchema = z.object({
   messages: z.array(messageSchema).min(1).max(50),
-  language: z.enum(["darija", "english", "french", "german"]).optional().default("darija"),
 });
 
 serve(async (req) => {
@@ -36,8 +35,8 @@ serve(async (req) => {
       });
     }
     
-    const { messages, language } = parseResult.data;
-    console.log("Received messages:", messages.length, "messages, language:", language);
+    const { messages } = parseResult.data;
+    console.log("Received messages:", messages.length, "messages");
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -62,34 +61,6 @@ serve(async (req) => {
       return msg;
     });
 
-    const systemPrompts = {
-      darija: `You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. You MUST respond in Moroccan Darija (الدارجة المغربية).
-
-Key guidelines:
-- Always respond in Darija using Arabic script or Latin transliteration based on how the user communicates
-- Keep responses clear, concise, and conversational
-- Be culturally aware and use appropriate Moroccan expressions
-- Common Darija phrases: "labas" (how are you), "wakha" (okay), "bzaf" (a lot), "mzyan" (good), "shukran" (thank you)`,
-      english: `You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. You MUST respond in English.
-
-Key guidelines:
-- Always respond in clear, natural English
-- Keep responses concise and conversational
-- Be helpful and friendly in your tone`,
-      french: `You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. You MUST respond in French.
-
-Key guidelines:
-- Always respond in clear, natural French
-- Keep responses concise and conversational
-- Be helpful and friendly in your tone`,
-      german: `You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. You MUST respond in German.
-
-Key guidelines:
-- Always respond in clear, natural German
-- Keep responses concise and conversational
-- Be helpful and friendly in your tone`,
-    };
-
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -101,7 +72,14 @@ Key guidelines:
         messages: [
           { 
             role: "system", 
-            content: systemPrompts[language]
+            content: `You are ChatKafi, a helpful and friendly AI assistant with vision capabilities. You are fluent in Moroccan Darija (الدارجة المغربية) and can understand and respond in Darija when users speak or write in it. 
+
+Key guidelines:
+- When users write or speak in Darija, respond naturally in Darija using Arabic script or Latin transliteration based on how they communicate
+- Keep responses clear, concise, and conversational
+- Be culturally aware and use appropriate Moroccan expressions when relevant
+- You can seamlessly switch between Darija, Arabic, English, and French based on user preference
+- Common Darija phrases you should know: "labas" (how are you), "wakha" (okay), "bzaf" (a lot), "mzyan" (good), "shukran" (thank you)` 
           },
           ...formattedMessages,
         ],
