@@ -1,103 +1,91 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 interface UseVoiceOutputOptions {
-  language?: string;
-  rate?: number;
-  pitch?: number;
+  onError?: (error: string) => void;
 }
 
-export const useVoiceOutput = ({ 
-  language = 'ar-SA', 
-  rate = 1, 
-  pitch = 1 
-}: UseVoiceOutputOptions = {}) => {
+export const useVoiceOutput = ({ onError }: UseVoiceOutputOptions = {}) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    setIsSupported('speechSynthesis' in window);
+  const speak = useCallback(async (text: string) => {
+    if (!text.trim()) return;
 
-    const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
-    };
-
-    if ('speechSynthesis' in window) {
-      loadVoices();
-      window.speechSynthesis.onvoiceschanged = loadVoices;
+    // Stop any ongoing speech
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
 
-    return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+    setIsLoading(true);
+    setIsSpeaking(false);
+
+    try {
+      const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`;
+      
+      const response = await fetch(TTS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate speech");
       }
-    };
-  }, []);
 
-  const getPreferredVoice = useCallback(() => {
-    // Try to find Arabic voice, fallback to any available
-    const arabicVoice = voices.find(v => 
-      v.lang.startsWith('ar') || v.lang.includes('Arab')
-    );
-    
-    if (arabicVoice) return arabicVoice;
-    
-    // Fallback to default
-    return voices.find(v => v.default) || voices[0];
-  }, [voices]);
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
 
-  const speak = useCallback((text: string) => {
-    if (!isSupported || !text.trim()) return;
+      audio.onplay = () => {
+        setIsLoading(false);
+        setIsSpeaking(true);
+      };
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language;
-    utterance.rate = rate;
-    utterance.pitch = pitch;
+      audio.onerror = () => {
+        setIsLoading(false);
+        setIsSpeaking(false);
+        onError?.("Failed to play audio");
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
 
-    const voice = getPreferredVoice();
-    if (voice) {
-      utterance.voice = voice;
+      await audio.play();
+    } catch (error) {
+      setIsLoading(false);
+      setIsSpeaking(false);
+      console.error("TTS error:", error);
+      onError?.(error instanceof Error ? error.message : "Failed to generate speech");
     }
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-  }, [isSupported, language, rate, pitch, getPreferredVoice]);
+  }, [onError]);
 
   const stop = useCallback(() => {
-    if (isSupported) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
     }
-  }, [isSupported]);
-
-  const pause = useCallback(() => {
-    if (isSupported) {
-      window.speechSynthesis.pause();
-    }
-  }, [isSupported]);
-
-  const resume = useCallback(() => {
-    if (isSupported) {
-      window.speechSynthesis.resume();
-    }
-  }, [isSupported]);
+    setIsSpeaking(false);
+    setIsLoading(false);
+  }, []);
 
   return {
     isSpeaking,
-    isSupported,
+    isLoading,
+    isSupported: true, // Always supported with API
     speak,
     stop,
-    pause,
-    resume,
-    voices,
   };
 };
