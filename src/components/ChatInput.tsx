@@ -195,7 +195,7 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isListening ? "Listening... (تكلم دبا)" : "KTB HNA"}
+                placeholder={isListening ? "Listening..." : "Type a message..."}
                 disabled={disabled || isListening}
                 className="min-h-[48px] max-h-[200px] resize-none focus-visible:ring-primary"
               />
