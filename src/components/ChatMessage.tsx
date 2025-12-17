@@ -31,10 +31,7 @@ const getFileIcon = (type: string) => {
 };
 
 export const ChatMessage = ({ role, content, imageUrl, fileData }: ChatMessageProps) => {
-  const { isSpeaking, isSupported, speak, stop } = useVoiceOutput({
-    language: 'ar-SA', // Arabic for Darija support
-    rate: 0.9,
-  });
+  const { isSpeaking, isLoading, isSupported, speak, stop } = useVoiceOutput();
 
   const handleSpeak = () => {
     if (isSpeaking) {
@@ -87,15 +84,20 @@ export const ChatMessage = ({ role, content, imageUrl, fileData }: ChatMessagePr
             onClick={handleSpeak}
             size="icon"
             variant="ghost"
+            disabled={isLoading}
             className={cn(
               "absolute -bottom-2 -right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg",
               isSpeaking 
                 ? "bg-emerald-500 hover:bg-emerald-600 text-white" 
+                : isLoading
+                ? "bg-muted"
                 : "bg-background hover:bg-muted border"
             )}
-            title={isSpeaking ? "Stop speaking" : "Listen to message (سمع الرسالة)"}
+            title={isSpeaking ? "Stop speaking" : isLoading ? "Loading..." : "Listen to message"}
           >
-            {isSpeaking ? (
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isSpeaking ? (
               <VolumeX className="h-4 w-4" />
             ) : (
               <Volume2 className="h-4 w-4" />
