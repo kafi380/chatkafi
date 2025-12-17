@@ -34,6 +34,49 @@ const Index = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Check if message is an image generation request
+  const isImageRequest = (text: string): string | null => {
+    const lowerText = text.toLowerCase();
+    const imageKeywords = [
+      'generate image', 'create image', 'make image', 'draw', 'generate a picture',
+      'create a picture', 'make a picture', 'generate an image', 'create an image',
+      'صور', 'رسم', 'اصنع صورة', 'ارسم', 'dir sora', 'rsm', 'sawwer'
+    ];
+    
+    for (const keyword of imageKeywords) {
+      if (lowerText.includes(keyword)) {
+        // Extract the prompt after the keyword
+        const index = lowerText.indexOf(keyword);
+        const afterKeyword = text.slice(index + keyword.length).trim();
+        // Remove common words like "of", "a", "an"
+        const cleanedPrompt = afterKeyword.replace(/^(of|a|an|the|for|about)\s+/i, '').trim();
+        return cleanedPrompt || text;
+      }
+    }
+    return null;
+  };
+
+  const generateImage = async (prompt: string): Promise<string> => {
+    const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-image`;
+    
+    const resp = await fetch(IMAGE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to generate image");
+    }
+
+    const data = await resp.json();
+    return data.imageUrl;
+  };
+
   const streamChat = async (chatMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
     
@@ -116,7 +159,32 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      await streamChat([...messages, userMsg]);
+      // Check if this is an image generation request
+      const imagePrompt = isImageRequest(input);
+      
+      if (imagePrompt) {
+        // Add a placeholder message while generating
+        setMessages(prev => [...prev, { 
+          role: "assistant", 
+          content: "🎨 Generating your image..." 
+        }]);
+        
+        const generatedImageUrl = await generateImage(imagePrompt);
+        
+        // Update the assistant message with the generated image
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = {
+            role: "assistant",
+            content: "Here's your generated image:",
+            imageUrl: generatedImageUrl
+          };
+          return newMessages;
+        });
+      } else {
+        // Regular chat
+        await streamChat([...messages, userMsg]);
+      }
     } catch (error) {
       console.error("Chat error:", error);
       toast({
@@ -124,7 +192,14 @@ const Index = () => {
         description: error instanceof Error ? error.message : "Failed to send message",
         variant: "destructive",
       });
-      setMessages(prev => prev.slice(0, -1));
+      // Remove the last assistant message if it was a placeholder
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && last.content.includes("Generating")) {
+          return prev.slice(0, -1);
+        }
+        return prev.slice(0, -1);
+      });
     } finally {
       setIsLoading(false);
     }
