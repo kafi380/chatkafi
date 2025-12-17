@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles, Mail, Lock, User, Chrome } from "lucide-react";
+import { Sparkles, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -15,7 +15,7 @@ const passwordSchema = z.string().min(6, "Password must be at least 6 characters
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { user, signUp, signIn, signInWithGoogle, loading } = useAuth();
+  const { user, signUp, signIn, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Login form state
@@ -113,19 +113,6 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsSubmitting(true);
-    const { error } = await signInWithGoogle();
-    setIsSubmitting(false);
-
-    if (error) {
-      toast({
-        title: "Google Sign-In Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   if (loading) {
     return (
@@ -154,25 +141,6 @@ const Auth = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Google Sign In */}
-          <Button 
-            variant="outline" 
-            className="w-full h-12 text-base gap-3"
-            onClick={handleGoogleSignIn}
-            disabled={isSubmitting}
-          >
-            <Chrome className="h-5 w-5" />
-            Continue with Google
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
-            </div>
-          </div>
 
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
