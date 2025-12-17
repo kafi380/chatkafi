@@ -1,81 +1,108 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface UseVoiceOutputOptions {
   onError?: (error: string) => void;
 }
 
+// Detect language from text
+const detectLanguage = (text: string): string => {
+  // Arabic/Darija detection (Arabic script)
+  if (/[\u0600-\u06FF]/.test(text)) return "ar-SA";
+  
+  // French common words
+  const frenchPatterns = /\b(je|tu|il|elle|nous|vous|bonjour|merci|oui|non|est|sont|les|des|une|pour|avec|dans|sur|par|plus|tout|faire|bien|très|aussi|comme|mais|quand|encore)\b/i;
+  if (frenchPatterns.test(text)) return "fr-FR";
+  
+  // Default to English
+  return "en-US";
+};
+
 export const useVoiceOutput = ({ onError }: UseVoiceOutputOptions = {}) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const speak = useCallback(async (text: string) => {
-    if (!text.trim()) return;
+  useEffect(() => {
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
+    };
 
-    // Stop any ongoing speech
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    if ('speechSynthesis' in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
     }
 
-    setIsLoading(true);
-    setIsSpeaking(false);
-
-    try {
-      const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`;
-      
-      const response = await fetch(TTS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate speech");
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
       }
+    };
+  }, []);
 
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
+  const getVoiceForLanguage = useCallback((lang: string) => {
+    // Try to find a voice matching the language
+    const exactMatch = voices.find(v => v.lang === lang);
+    if (exactMatch) return exactMatch;
 
-      audio.onplay = () => {
-        setIsLoading(false);
-        setIsSpeaking(true);
-      };
+    // Try partial match (e.g., "en" matches "en-US")
+    const langPrefix = lang.split('-')[0];
+    const partialMatch = voices.find(v => v.lang.startsWith(langPrefix));
+    if (partialMatch) return partialMatch;
 
-      audio.onended = () => {
-        setIsSpeaking(false);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-      };
+    // Fallback to default or first available
+    return voices.find(v => v.default) || voices[0];
+  }, [voices]);
 
-      audio.onerror = () => {
-        setIsLoading(false);
-        setIsSpeaking(false);
-        onError?.("Failed to play audio");
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-      };
+  const speak = useCallback((text: string) => {
+    if (!text.trim()) return;
+    if (!('speechSynthesis' in window)) {
+      onError?.("Speech synthesis not supported in this browser");
+      return;
+    }
 
-      await audio.play();
-    } catch (error) {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    setIsLoading(true);
+
+    // Detect language from text
+    const detectedLang = detectLanguage(text);
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = detectedLang;
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+
+    const voice = getVoiceForLanguage(detectedLang);
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.onstart = () => {
+      setIsLoading(false);
+      setIsSpeaking(true);
+    };
+    
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+    
+    utterance.onerror = (event) => {
       setIsLoading(false);
       setIsSpeaking(false);
-      console.error("TTS error:", error);
-      onError?.(error instanceof Error ? error.message : "Failed to generate speech");
-    }
-  }, [onError]);
+      if (event.error !== 'canceled') {
+        onError?.("Failed to speak text");
+      }
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  }, [getVoiceForLanguage, onError]);
 
   const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
     setIsSpeaking(false);
     setIsLoading(false);
@@ -84,7 +111,7 @@ export const useVoiceOutput = ({ onError }: UseVoiceOutputOptions = {}) => {
   return {
     isSpeaking,
     isLoading,
-    isSupported: true, // Always supported with API
+    isSupported: 'speechSynthesis' in window,
     speak,
     stop,
   };
