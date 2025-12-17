@@ -10,6 +10,7 @@ interface VoiceButtonProps {
   disabled?: boolean;
   type: 'input' | 'output';
   className?: string;
+  title?: string;
 }
 
 export const VoiceButton = ({
@@ -20,6 +21,7 @@ export const VoiceButton = ({
   disabled,
   type,
   className,
+  title: customTitle,
 }: VoiceButtonProps) => {
   const isActive = type === 'input' ? isListening : isSpeaking;
 
@@ -36,9 +38,9 @@ export const VoiceButton = ({
         className
       )}
       title={
-        type === 'input' 
+        customTitle || (type === 'input' 
           ? (isListening ? "Stop listening" : "Start voice input (Darija supported)")
-          : (isSpeaking ? "Stop speaking" : "Listen to response")
+          : (isSpeaking ? "Stop speaking" : "Listen to response"))
       }
     >
       {isLoading ? (

@@ -157,7 +157,8 @@ export const ChatInput = ({ onSend, disabled, isGuest = false }: ChatInputProps)
               type="input"
               isListening={isListening}
               onClick={handleVoiceClick}
-              disabled={disabled}
+              disabled={disabled || isGuest}
+              title={isGuest ? "Sign in to use voice input" : undefined}
             />
             <Button
               onClick={() => setCameraOpen(true)}
