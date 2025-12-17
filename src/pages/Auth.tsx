@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Sparkles, Mail, Lock, User, ArrowLeft } from "lucide-react";
@@ -19,8 +20,9 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Login form state
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState(() => localStorage.getItem("rememberedEmail") || "");
   const [loginPassword, setLoginPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem("rememberedEmail"));
   
   // Signup form state
   const [signupEmail, setSignupEmail] = useState("");
@@ -51,6 +53,14 @@ const Auth = () => {
     }
 
     setIsSubmitting(true);
+    
+    // Handle remember me
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", loginEmail);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+    
     const { error } = await signIn(loginEmail, loginPassword);
     setIsSubmitting(false);
 
@@ -179,6 +189,16 @@ const Auth = () => {
                       required
                     />
                   </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="remember-me" 
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  />
+                  <Label htmlFor="remember-me" className="text-sm font-normal cursor-pointer">
+                    Remember me
+                  </Label>
                 </div>
                 <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
                   {isSubmitting ? "Signing in..." : "Sign In"}
